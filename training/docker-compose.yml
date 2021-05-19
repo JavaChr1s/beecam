@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  training_lite:
+     build:
+        context: .
+        dockerfile: Dockerfile
+     network_mode: host
+     restart: "no"
+     volumes:
+        - ./images:/training/images
+        - ./output:/training/model
+     privileged: true
+     runtime: nvidia
+     environment:
+        - PYTHONPATH=/tensorflow/models/research:/tensorflow/models/research/slim
