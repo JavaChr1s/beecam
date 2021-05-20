@@ -25,7 +25,7 @@ import cv2
 import time
 import argparse
 import logging
-
+import shutil
 import tflite_runtime.interpreter as tflite
 
 import json
@@ -150,7 +150,7 @@ def main():
 	debug_threshold = 0.5
 	
 	input_folder = "/app/input"
-	input_filename = "smurf_input.avi"
+	input_filename = "biene.mp4"
 	done_folder = "/app/done"
 	cap = cv2.VideoCapture(input_folder + "/" + input_filename)
 # Loop over every image and perform detection
@@ -213,7 +213,7 @@ def main():
 	cv2.destroyAllWindows()
 
 	print ("Moved file " + input_filename + " to " + done_folder)
-	os.rename(input_folder + "/" + input_filename, done_folder + "/" + input_filename)
+	shutil.move(input_folder + "/" + input_filename, done_folder + "/" + input_filename)
 
 	elapsed_time = time.time() - start_time
 	print('Object detection done! Elapsed time: ' + str(elapsed_time) + 's, number of frames: ' + str(frame_count) + ', fps: ' + str(frame_count / elapsed_time))
