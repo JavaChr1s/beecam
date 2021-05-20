@@ -72,7 +72,7 @@ def load_labels(modelDir, encoding='utf-8'):
 
 	category_index = {}
 	for index, label in enumerate(lines):
-		category = { "id": index, "name": label }
+		category = { "id": index, "name": label.replace('\n','') }
 		category_index[index] = category
 	return category_index
 
@@ -108,7 +108,9 @@ def main():
 	
 	input_folder = "/app/input"
 	done_folder = "/app/done"
-
+	output_folder = "/app/output"
+	output_file = output_folder + "/detected_objects.csv"
+	
 	print ("Tool loaded!")
 
 	while True:
@@ -181,14 +183,26 @@ def main():
 				
 				cap.release()
 				cv2.destroyAllWindows()
+
+				
+				if not os.path.isfile(output_file):
+					with open(output_file, "x") as output:
+						line = "file"
+						for attr, value in labels.items():
+							line = line + ";" + str(results[attr].get("name"))
+						output.write(line)
+				
+				with open(output_file, "a") as output:
+					line = "\n" + input_filename
+					for attr, value in labels.items():
+						line = line + ";" + str(results[attr].get("value"))
+					output.write(line)
 				
 				print ("Moved file " + input_filename + " to " + done_folder)
 				shutil.move(input_folder + "/" + input_filename, done_folder + "/" + input_filename)
 
-
 				elapsed_time = time.time() - start_time
 				print('Object detection done! Elapsed time: ' + str(elapsed_time) + 's, number of frames: ' + str(frame_count) + ', fps: ' + str(frame_count / elapsed_time))
-		print ("Waiting for new input files coming in...")
 		time.sleep(1)
 
 if __name__ == '__main__':

@@ -12,6 +12,7 @@ services:
         - /opt/vc:/opt/vc
         - ./input:/app/input
         - ./done:/app/done
+        - ./output:/app/output
         - ./models:/app/models
         - /tmp/.X11-unix:/tmp/.X11-unix
      environment:
