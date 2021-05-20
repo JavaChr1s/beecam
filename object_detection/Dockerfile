@@ -17,4 +17,5 @@ COPY python /app/python
 
 WORKDIR /app/python
 
-CMD ["tail","-f","/dev/null"]
+#CMD ["tail","-f","/dev/null"]
+CMD ["python3", "object_detection.py"]
