@@ -76,56 +76,20 @@ def load_labels(modelDir, encoding='utf-8'):
 		category_index[index] = category
 	return category_index
 
-def make_interpreter(model_dir, enable_tpu):
+def make_interpreter(model_dir):
 	model_file = findFileWithExtension(".tflite", model_dir)
 	model_file, *device = model_file.split('@')
 	print(f"device={device}")
-	# is edgetpu enabled
-	if enable_tpu:
-		return tflite.Interpreter(
-			model_path=model_file,
-			experimental_delegates=[
-				tflite.load_delegate(EDGETPU_SHARED_LIB,
-									 {'device': device[0]} if device else {})
-			])
-	else:
-		return tflite.Interpreter(
-			model_path=model_file
-		)
+	return tflite.Interpreter(
+		model_path=model_file
+	)
 
 
 def main():
-	parser = argparse.ArgumentParser(
-		formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-
-	parser.add_argument('-t', '--threshold', type=float, default=0.5,
-						help='Score threshold for detected objects.')
-	parser.add_argument('-c', '--count', type=int, default=5,
-						help='Number of times to run inference')
-	parser.add_argument('-tpu', '--enable-tpu', action='store_true',
-						help='Whether TPU is enabled or not')
-	parser.add_argument('-objects', '--detect-objects', type=str, default="bird")
-	parser.add_argument('-debug', '--enable-debug', action='store_true',
-						help='Whether Debug is enabled or not - Webcamera viewed is displayed when in this mode')
-
-	parser.add_argument("-cslack", "--clear-slack-files", action='store_true',
-					help="clears files in slack")
-
-	parser.add_argument("-slack", "--slack-credentials", type=str, default="config.ini",
-					help="path to optional slack configuration")
-
-	args = parser.parse_args()
-
-
-	objects_to_detect = args.detect_objects
-
 	model_dir = "/app/models"
-
 	labels = load_labels(model_dir)
 
-	interpreter = make_interpreter(model_dir, args.enable_tpu)
-
+	interpreter = make_interpreter(model_dir)
 	interpreter.allocate_tensors()
 
 	# Get model details
@@ -139,84 +103,91 @@ def main():
 	input_mean = 127.5
 	input_std = 127.5
 	
-	
-	results = {}
-	for attr, value in labels.items():
-		result = {"id": attr, "name": value.get("name"), "value": 0}
-		results[attr] = result
-	
-	frame_count = 0
-	
+	threshold = 0.8
 	debug_threshold = 0.5
 	
 	input_folder = "/app/input"
-	input_filename = "biene.mp4"
 	done_folder = "/app/done"
-	cap = cv2.VideoCapture(input_folder + "/" + input_filename)
-# Loop over every image and perform detection
-	start_time = time.time()
-	while(cap.isOpened()):
-		start_time_frame = time.time()
-		ret, image = cap.read()
-		if not	ret:
-			print("end of the video file...")
-			break
-			
-		frame_count = frame_count+1
 
-		image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-		imH, imW, _ = image.shape 
-		image_resized = cv2.resize(image_rgb, (width, height))
-		input_data = np.expand_dims(image_resized, axis=0)
+	while True:
+		for input_filename in os.listdir(input_folder):
+			input_file = os.path.join(input_folder, input_filename)
+			if os.path.isfile(input_file):
+		
+				results = {}
+				for attr, value in labels.items():
+					result = {"id": attr, "name": value.get("name"), "value": 0}
+					results[attr] = result
+				
+				cap = cv2.VideoCapture(input_file)
+			# Loop over every image and perform detection
+				start_time = time.time()
+				frame_count = 0
+				while(cap.isOpened()):
+					start_time_frame = time.time()
+					ret, image = cap.read()
+					if not	ret:
+						print("end of the video file...")
+						break
+						
+					frame_count = frame_count+1
 
-		# Normalize pixel values if using a floating model (i.e. if model is non-quantized)
-		if floating_model:
-			input_data = (np.float32(input_data) - input_mean) / input_std
+					image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+					imH, imW, _ = image.shape 
+					image_resized = cv2.resize(image_rgb, (width, height))
+					input_data = np.expand_dims(image_resized, axis=0)
 
-		# Perform the actual detection by running the model with the image as input
-		interpreter.set_tensor(input_details[0]['index'],input_data)
-		interpreter.invoke()
+					# Normalize pixel values if using a floating model (i.e. if model is non-quantized)
+					if floating_model:
+						input_data = (np.float32(input_data) - input_mean) / input_std
 
-		# Retrieve detection results
-		boxes = interpreter.get_tensor(output_details[0]['index'])[0] # Bounding box coordinates of detected objects
-		classes = interpreter.get_tensor(output_details[1]['index'])[0] # Class index of detected objects
-		scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
-		#num = interpreter.get_tensor(output_details[3]['index'])[0]	# Total number of detected objects (inaccurate and not needed)
+					# Perform the actual detection by running the model with the image as input
+					interpreter.set_tensor(input_details[0]['index'],input_data)
+					interpreter.invoke()
 
-		# initialize frame results
-		frameResults = {}
-		for index, value in enumerate(classes):
-			if value in results:
-				frameResults[value] = 0
+					# Retrieve detection results
+					boxes = interpreter.get_tensor(output_details[0]['index'])[0] # Bounding box coordinates of detected objects
+					classes = interpreter.get_tensor(output_details[1]['index'])[0] # Class index of detected objects
+					scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
+					#num = interpreter.get_tensor(output_details[3]['index'])[0]	# Total number of detected objects (inaccurate and not needed)
 
-		# check frame for results
-		for index, value in enumerate(classes):
-			if value in results:
-				if scores[index] > debug_threshold:
-					print ("debug: ", (results[value]["name"] + ": "), scores[index])
-	
-				if scores[index] > args.threshold:
-					frameResults[value] = (frameResults[value] + 1)
-	
-		# add frame results to global results
-		for attr, value in frameResults.items():
-			if results[attr]["value"] < value:
-				results[attr]["value"] = value
+					# initialize frame results
+					frameResults = {}
+					for index, value in enumerate(classes):
+						if value in results:
+							frameResults[value] = 0
 
-		for attr, result in results.items():
-			if result["value"] > 0:
-				print ((result["name"] + ": "), result["value"])
+					# check frame for results
+					for index, value in enumerate(classes):
+						if value in results:
+							if scores[index] > debug_threshold:
+								print ("debug: ", (results[value]["name"] + ": "), scores[index])
+				
+							if scores[index] > threshold:
+								frameResults[value] = (frameResults[value] + 1)
+				
+					# add frame results to global results
+					for attr, value in frameResults.items():
+						if results[attr]["value"] < value:
+							results[attr]["value"] = value
 
-		print ("speed: " + str(1 / (time.time() - start_time_frame)) + " fps")
-	
-	cap.release()
-	cv2.destroyAllWindows()
+					for attr, result in results.items():
+						if result["value"] > 0:
+							print ((result["name"] + ": "), result["value"])
 
-	print ("Moved file " + input_filename + " to " + done_folder)
-	shutil.move(input_folder + "/" + input_filename, done_folder + "/" + input_filename)
+					print ("speed: " + str(1 / (time.time() - start_time_frame)) + " fps")
+				
+				cap.release()
+				cv2.destroyAllWindows()
+				
+				print ("Moved file " + input_filename + " to " + done_folder)
+				shutil.move(input_folder + "/" + input_filename, done_folder + "/" + input_filename)
 
-	elapsed_time = time.time() - start_time
-	print('Object detection done! Elapsed time: ' + str(elapsed_time) + 's, number of frames: ' + str(frame_count) + ', fps: ' + str(frame_count / elapsed_time))
+
+				elapsed_time = time.time() - start_time
+				print('Object detection done! Elapsed time: ' + str(elapsed_time) + 's, number of frames: ' + str(frame_count) + ', fps: ' + str(frame_count / elapsed_time))
+		print ("Waiting for new input files coming in...")
+		sleep(1)
 
 if __name__ == '__main__':
 	logger = setupLogger()
