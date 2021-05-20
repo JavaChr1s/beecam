@@ -109,10 +109,12 @@ def main():
 	input_folder = "/app/input"
 	done_folder = "/app/done"
 
+	print ("Tool loaded!")
+
 	while True:
 		for input_filename in os.listdir(input_folder):
 			input_file = os.path.join(input_folder, input_filename)
-			if os.path.isfile(input_file):
+			if os.path.isfile(input_file) and input_file.endswith(".mp4"):
 		
 				results = {}
 				for attr, value in labels.items():
@@ -187,7 +189,7 @@ def main():
 				elapsed_time = time.time() - start_time
 				print('Object detection done! Elapsed time: ' + str(elapsed_time) + 's, number of frames: ' + str(frame_count) + ', fps: ' + str(frame_count / elapsed_time))
 		print ("Waiting for new input files coming in...")
-		sleep(1)
+		time.sleep(1)
 
 if __name__ == '__main__':
 	logger = setupLogger()
