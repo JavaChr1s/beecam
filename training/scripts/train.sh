@@ -3,10 +3,10 @@
 mkdir temp
 
 echo "Generating TFRecord for training objects..."
-python3 xml_to_csv.py /training/images/train TRAINING
+python3 xml_to_csv.py /training/images/train/ TRAINING
 
 echo "Generating TFRecord for testing objects..."
-python3 xml_to_csv.py /training/images/test TEST
+python3 xml_to_csv.py /training/images/test/ TEST
 
 echo "Start training..."
 python3 train.py

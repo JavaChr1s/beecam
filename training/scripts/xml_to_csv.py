@@ -6,16 +6,19 @@ import sys
 
 def xml_to_csv(path, set_type = "TRAINING"):
     xml_list = []
-    for xml_file in glob.glob(path + '/*.xml'):
+    for xml_file in glob.glob(path + '/**/*.xml', recursive=True):
         tree = ET.parse(xml_file)
         root = tree.getroot()
-        size = root.find("size")
-        width = int(size.find("width").text)
-        height = int(size.find("height").text)
-        for member in root.findall('object'):
-            if ( os.path.basename(root.find('path').text).endswith(".jpg")):
+        image_path_from_xml = os.path.basename(root.find('path').text)
+        if ( image_path_from_xml.endswith(".jpg")):
+            size = root.find("size")
+            width = int(size.find("width").text)
+            height = int(size.find("height").text)
+            recursive_path = xml_file.rsplit('/', 1)[0].rsplit(path, 1)[1]
+            image_filename_from_xml = image_path_from_xml.rsplit('/', 1)[-1].rsplit('\\', 1)[-1]
+            for member in root.findall('object'):
                 value = (set_type,
-            	     os.path.basename(root.find('path').text),
+                     recursive_path + '/' + image_filename_from_xml,
                      member[0].text,
                      1 / width * int(member[4][0].text),
                      1 / height * int(member[4][1].text),
