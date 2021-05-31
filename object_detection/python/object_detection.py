@@ -103,7 +103,7 @@ def main():
 	input_mean = 127.5
 	input_std = 127.5
 	
-	threshold = 0.8
+	threshold = 0.7
 	debug_threshold = 0.5
 	
 	input_folder = "/app/input"
