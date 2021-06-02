@@ -4,7 +4,7 @@ services:
         container_name: analyzer 
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile_raspi
         network_mode: host
         restart: always
         volumes:
