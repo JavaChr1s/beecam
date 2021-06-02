@@ -12,4 +12,6 @@ services:
             - ./done:/app/done
             - ./output:/app/output
             - ./models:/app/models
+        environment:
+            - OBJECT_DETECTION_THREADS=${OBJECT_DETECTION_THREADS}
         privileged: true

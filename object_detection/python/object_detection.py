@@ -76,12 +76,13 @@ def load_labels(modelDir, encoding='utf-8'):
 		category_index[index] = category
 	return category_index
 
-def make_interpreter(model_dir):
+def make_interpreter(model_dir, num_threads):
 	model_file = findFileWithExtension(".tflite", model_dir)
 	model_file, *device = model_file.split('@')
-	print(f"device={device}")
+	print(f"threads={num_threads}")
 	return tflite.Interpreter(
-		model_path=model_file
+		model_path=model_file,
+		num_threads=num_threads
 	)
 
 
@@ -89,7 +90,11 @@ def main():
 	model_dir = "/app/models"
 	labels = load_labels(model_dir)
 
-	interpreter = make_interpreter(model_dir)
+	num_threads = 1
+	if os.getenv('OBJECT_DETECTION_THREADS'):
+		num_threads = int(os.getenv('OBJECT_DETECTION_THREADS'))
+
+	interpreter = make_interpreter(model_dir, num_threads)
 	interpreter.allocate_tensors()
 
 	# Get model details

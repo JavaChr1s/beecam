@@ -18,6 +18,7 @@ COPY python /app/python
 WORKDIR /app/python
 
 ENV PYTHONUNBUFFERED 1
+ENV OBJECT_DETECTION_THREADS 4
 
 #CMD ["tail","-f","/dev/null"]
 CMD ["python3", "object_detection.py"]
