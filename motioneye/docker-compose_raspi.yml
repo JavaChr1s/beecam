@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+    motioneye:
+        container_name: motioneye 
+        image: ccrisan/motioneye:master-armhf
+        restart: always
+        ports:
+            - 8765:8765
+            - 8081:8081
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - ./motioneye:/etc/motioneye
+            - ./storage:/var/lib/motioneye
+        privileged: true
+        environment:
+            - LD_LIBRARY_PATH=/opt/vc/lib
+        devices:
+            - "/dev/vchiq"
