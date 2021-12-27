@@ -10,9 +10,19 @@ services:
         volumes:
             - /etc/localtime:/etc/localtime:ro
             - ./motioneye:/etc/motioneye
-            - ./storage:/var/lib/motioneye
+            - /media/usbstick:/var/lib/motioneye
         privileged: true
         environment:
             - LD_LIBRARY_PATH=/opt/vc/lib
         devices:
             - "/dev/vchiq"
+            - "/dev/video0"
+            - "/dev/video10"
+            - "/dev/video11"
+            - "/dev/video12"
+            - "/dev/video13"
+            - "/dev/video14"
+            - "/dev/video15"
+            - "/dev/video16"
+            - "/dev/video17"
+            - "/dev/video18"

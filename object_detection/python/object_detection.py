@@ -87,12 +87,46 @@ def make_interpreter(model_dir, num_threads):
 
 
 def main():
-	model_dir = "/app/models"
-	labels = load_labels(model_dir)
-
 	num_threads = 1
 	if os.getenv('OBJECT_DETECTION_THREADS'):
 		num_threads = int(os.getenv('OBJECT_DETECTION_THREADS'))
+		
+	model_dir = "/app/models"
+	
+	general_frames_folder = True
+	draw_box = True
+	
+	threshold = 0.7
+	debug_threshold = 0.5
+	
+	input_folder = "/app/input"
+	done_folder = "/app/done"
+	output_folder = "/app/output"
+	output_file = output_folder + "/detected_objects.csv"
+	
+	with open('/app/config.json') as config_file:
+		config = json.load(config_file)
+		general_frames_folder = config["general_frames_folder"]
+		draw_box = config["draw_box"]
+		threshold = config["threshold"]
+		debug_threshold = config["debug_threshold"]
+		input_folder = config["input_folder"]
+		done_folder = config["done_folder"]
+		output_folder = config["output_folder"]
+		model_dir = config["model_dir"]
+		if config["threads"]:
+			num_threads = config["threads"]
+		
+	print ("general_frames_folder: ", general_frames_folder)
+	print ("draw_box: ", draw_box)
+	print ("threshold: ", threshold)
+	print ("debug_threshold: ", debug_threshold)
+	print ("input_folder: ", input_folder)
+	print ("done_folder: ", done_folder)
+	print ("output_folder: ", output_folder)
+	print ("model_dir: ", model_dir)
+		
+	labels = load_labels(model_dir)
 
 	interpreter = make_interpreter(model_dir, num_threads)
 	interpreter.allocate_tensors()
@@ -107,14 +141,6 @@ def main():
 
 	input_mean = 127.5
 	input_std = 127.5
-	
-	threshold = 0.7
-	debug_threshold = 0.5
-	
-	input_folder = "/app/input"
-	done_folder = "/app/done"
-	output_folder = "/app/output"
-	output_file = output_folder + "/detected_objects.csv"
 	
 	print ("Tool loaded!")
 
@@ -169,11 +195,36 @@ def main():
 					# check frame for results
 					for index, value in enumerate(classes):
 						if value in results:
+							classification = results[value]["name"]
 							if scores[index] > debug_threshold:
-								print ("debug: ", (results[value]["name"] + ": "), scores[index])
+								print ("debug: ", (classification + ": "), scores[index])
 				
 							if scores[index] > threshold:
-								frameResults[value] = (frameResults[value] + 1)
+								frameResults[value] = (frameResults[value] + 1)								
+								if draw_box:
+									ymin, xmin, ymax, xmax = boxes[index]
+									xmin = int(xmin * image.shape[1])
+									xmax = int(xmax * image.shape[1])
+									ymin = int(ymin * image.shape[0])
+									ymax = int(ymax * image.shape[0])
+									
+									color = (0, 155, 0)
+									cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
+								frame_path = output_folder
+								movie = input_filename.split(".")[0]
+								frame_filename = str(frame_count) + ".jpg"
+								if general_frames_folder:
+									frame_path = frame_path + "/frames/" + movie
+								else:
+									y = ymin - 15 if ymin - 15 > 15 else ymin + 15
+									label = "{}: {:.0f}%".format(classification, scores[index] * 100)
+									cv2.putText(image, label, (xmin, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+									frame_path = frame_path + "/" + classification
+									frame_filename = movie + "__" + frame_filename
+								if not os.path.exists(frame_path):
+									os.makedirs(frame_path)
+								cv2.imwrite(os.path.join(frame_path, frame_filename), image)
+								print ("Frame saved to ", frame_path)
 				
 					# add frame results to global results
 					for attr, value in frameResults.items():
@@ -192,15 +243,21 @@ def main():
 				
 				if not os.path.isfile(output_file):
 					with open(output_file, "x") as output:
-						line = "file"
+						line = "file;sum"
 						for attr, value in labels.items():
 							line = line + ";" + str(results[attr].get("name"))
 						output.write(line)
 				
+				objects_found = 0
+
 				with open(output_file, "a") as output:
 					line = "\n" + input_filename
+					values = ""
 					for attr, value in labels.items():
-						line = line + ";" + str(results[attr].get("value"))
+						result = results[attr].get("value")
+						values = values + ";" + str(result)
+						objects_found = objects_found + result
+					line = line + ";" + str(objects_found) + values
 					output.write(line)
 				
 				print ("Moved file " + input_filename + " to " + done_folder)

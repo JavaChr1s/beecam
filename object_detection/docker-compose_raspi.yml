@@ -8,8 +8,9 @@ services:
         network_mode: host
         restart: always
         volumes:
-            - ./input:/app/input
-            - ./done:/app/done
-            - ./output:/app/output
+            - /media/usbstick/raw:/app/input
+            - /media/usbstick/analyzed:/app/done
+            - /media/usbstick/data:/app/output
+            - /media/usbstick/config.json:/app/config.json
             - ./models:/app/models
         privileged: true
