@@ -28,6 +28,9 @@ import logging
 import shutil
 import tflite_runtime.interpreter as tflite
 
+import traceback
+import logging
+
 import json
 
 EDGETPU_SHARED_LIB="libedgetpu.so.1"
@@ -100,6 +103,7 @@ def main():
 	debug_threshold = 0.5
 	
 	input_folder = "/app/input"
+	error_folder = "/app/error"
 	done_folder = "/app/done"
 	output_folder = "/app/output"
 	output_file = output_folder + "/detected_objects.csv"
@@ -112,6 +116,7 @@ def main():
 		debug_threshold = config["debug_threshold"]
 		input_folder = config["input_folder"]
 		done_folder = config["done_folder"]
+		error_folder = config["error_folder"]
 		output_folder = config["output_folder"]
 		model_dir = config["model_dir"]
 		if config["threads"]:
@@ -123,6 +128,7 @@ def main():
 	print ("debug_threshold: ", debug_threshold)
 	print ("input_folder: ", input_folder)
 	print ("done_folder: ", done_folder)
+	print ("error_folder: ", error_folder)
 	print ("output_folder: ", output_folder)
 	print ("model_dir: ", model_dir)
 		
@@ -146,125 +152,140 @@ def main():
 
 	while True:
 		for input_filename in os.listdir(input_folder):
-			input_file = os.path.join(input_folder, input_filename)
-			if os.path.isfile(input_file) and input_file.endswith(".mp4"):
-		
-				results = {}
-				for attr, value in labels.items():
-					result = {"id": attr, "name": value.get("name"), "value": 0}
-					results[attr] = result
-				
-				cap = cv2.VideoCapture(input_file)
-			# Loop over every image and perform detection
-				start_time = time.time()
-				frame_count = 0
-				while(cap.isOpened()):
-					start_time_frame = time.time()
-					ret, image = cap.read()
-					if not	ret:
-						print("end of the video file...")
-						break
-						
-					frame_count = frame_count+1
-
-					image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-					imH, imW, _ = image.shape 
-					image_resized = cv2.resize(image_rgb, (width, height))
-					input_data = np.expand_dims(image_resized, axis=0)
-
-					# Normalize pixel values if using a floating model (i.e. if model is non-quantized)
-					if floating_model:
-						input_data = (np.float32(input_data) - input_mean) / input_std
-
-					# Perform the actual detection by running the model with the image as input
-					interpreter.set_tensor(input_details[0]['index'],input_data)
-					interpreter.invoke()
-
-					# Retrieve detection results
-					boxes = interpreter.get_tensor(output_details[0]['index'])[0] # Bounding box coordinates of detected objects
-					classes = interpreter.get_tensor(output_details[1]['index'])[0] # Class index of detected objects
-					scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
-					#num = interpreter.get_tensor(output_details[3]['index'])[0]	# Total number of detected objects (inaccurate and not needed)
-
-					# initialize frame results
-					frameResults = {}
-					for index, value in enumerate(classes):
-						if value in results:
-							frameResults[value] = 0
-
-					# check frame for results
-					for index, value in enumerate(classes):
-						if value in results:
-							classification = results[value]["name"]
-							if scores[index] > debug_threshold:
-								print ("debug: ", (classification + ": "), scores[index])
-				
-							if scores[index] > threshold:
-								frameResults[value] = (frameResults[value] + 1)								
-								if draw_box:
-									ymin, xmin, ymax, xmax = boxes[index]
-									xmin = int(xmin * image.shape[1])
-									xmax = int(xmax * image.shape[1])
-									ymin = int(ymin * image.shape[0])
-									ymax = int(ymax * image.shape[0])
-									
-									color = (0, 155, 0)
-									cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
-								frame_path = output_folder
-								movie = input_filename.split(".")[0]
-								frame_filename = str(frame_count) + ".jpg"
-								if general_frames_folder:
-									frame_path = frame_path + "/frames/" + movie
-								else:
-									y = ymin - 15 if ymin - 15 > 15 else ymin + 15
-									label = "{}: {:.0f}%".format(classification, scores[index] * 100)
-									cv2.putText(image, label, (xmin, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-									frame_path = frame_path + "/" + classification
-									frame_filename = movie + "__" + frame_filename
-								if not os.path.exists(frame_path):
-									os.makedirs(frame_path)
-								cv2.imwrite(os.path.join(frame_path, frame_filename), image)
-								print ("Frame saved to ", frame_path)
-				
-					# add frame results to global results
-					for attr, value in frameResults.items():
-						if results[attr]["value"] < value:
-							results[attr]["value"] = value
-
-					for attr, result in results.items():
-						if result["value"] > 0:
-							print ((result["name"] + ": "), result["value"])
-
-					print ("speed: " + str(1 / (time.time() - start_time_frame)) + " fps")
-				
-				cap.release()
-				cv2.destroyAllWindows()
-
-				
-				if not os.path.isfile(output_file):
-					with open(output_file, "x") as output:
-						line = "file;sum"
-						for attr, value in labels.items():
-							line = line + ";" + str(results[attr].get("name"))
-						output.write(line)
-				
-				objects_found = 0
-
-				with open(output_file, "a") as output:
-					line = "\n" + input_filename
-					values = ""
+			try:
+				input_file = os.path.join(input_folder, input_filename)
+				if os.path.isfile(input_file) and input_file.endswith(".mp4"):
+			
+					results = {}
 					for attr, value in labels.items():
-						result = results[attr].get("value")
-						values = values + ";" + str(result)
-						objects_found = objects_found + result
-					line = line + ";" + str(objects_found) + values
-					output.write(line)
-				
-				print ("Moved file " + input_filename + " to " + done_folder)
-				shutil.move(input_folder + "/" + input_filename, done_folder + "/" + input_filename)
+						result = {"id": attr, "name": value.get("name"), "value": 0}
+						results[attr] = result
+					
+					cap = cv2.VideoCapture(input_file)
+				# Loop over every image and perform detection
+					start_time = time.time()
+					frame_count = 0
+					while(cap.isOpened()):
+						start_time_frame = time.time()
+						ret, image = cap.read()
+						if not	ret:
+							print("end of the video file...")
+							break
+							
+						frame_count = frame_count+1
 
-				elapsed_time = time.time() - start_time
-				print('Object detection done! Elapsed time: ' + str(elapsed_time) + 's, number of frames: ' + str(frame_count) + ', fps: ' + str(frame_count / elapsed_time))
+						image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+						imH, imW, _ = image.shape 
+						image_resized = cv2.resize(image_rgb, (width, height))
+						input_data = np.expand_dims(image_resized, axis=0)
+
+						# Normalize pixel values if using a floating model (i.e. if model is non-quantized)
+						if floating_model:
+							input_data = (np.float32(input_data) - input_mean) / input_std
+
+						# Perform the actual detection by running the model with the image as input
+						interpreter.set_tensor(input_details[0]['index'],input_data)
+						interpreter.invoke()
+
+						# Retrieve detection results
+						boxes = interpreter.get_tensor(output_details[0]['index'])[0] # Bounding box coordinates of detected objects
+						classes = interpreter.get_tensor(output_details[1]['index'])[0] # Class index of detected objects
+						scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
+						#num = interpreter.get_tensor(output_details[3]['index'])[0]	# Total number of detected objects (inaccurate and not needed)
+
+						# initialize frame results
+						frameResults = {}
+						for index, value in enumerate(classes):
+							if value in results:
+								frameResults[value] = 0
+
+						# check frame for results
+						for index, value in enumerate(classes):
+							if value in results:
+								classification = results[value]["name"]
+								if scores[index] > debug_threshold:
+									print ("debug: ", (classification + ": "), scores[index])
+					
+								if scores[index] > threshold:
+									frameResults[value] = (frameResults[value] + 1)								
+									if draw_box:
+										ymin, xmin, ymax, xmax = boxes[index]
+										xmin = int(xmin * image.shape[1])
+										xmax = int(xmax * image.shape[1])
+										ymin = int(ymin * image.shape[0])
+										ymax = int(ymax * image.shape[0])
+										
+										color = (0, 155, 0)
+										cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
+									frame_path = output_folder
+									movie = input_filename.split(".")[0]
+									frame_filename = str(frame_count) 
+									if general_frames_folder:
+										frame_path = frame_path + "/frames/" + movie
+										frame_filename = frame_filename + "__" + classification + "_" + str(int(scores[index] * 100))
+									else:
+										y = ymin - 15 if ymin - 15 > 15 else ymin + 15
+										label = "{}: {:.0f}%".format(classification, scores[index] * 100)
+										cv2.putText(image, label, (xmin, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+										frame_path = frame_path + "/" + classification
+										frame_filename = movie + "__" + frame_filename
+									if not os.path.exists(frame_path):
+										os.makedirs(frame_path)
+									cv2.imwrite(os.path.join(frame_path, frame_filename + ".jpg"), image)
+									print ("Frame saved to ", frame_path)
+					
+						# add frame results to global results
+						for attr, value in frameResults.items():
+							if results[attr]["value"] < value:
+								results[attr]["value"] = value
+
+						for attr, result in results.items():
+							if result["value"] > 0:
+								print ((result["name"] + ": "), result["value"])
+
+						print ("speed: " + str(1 / (time.time() - start_time_frame)) + " fps")
+					
+					cap.release()
+					cv2.destroyAllWindows()
+
+					
+					if not os.path.isfile(output_file):
+						with open(output_file, "x") as output:
+							line = "file;sum"
+							for attr, value in labels.items():
+								line = line + ";" + str(results[attr].get("name"))
+							output.write(line)
+					
+					objects_found = 0
+
+					with open(output_file, "a") as output:
+						line = "\n" + input_filename
+						values = ""
+						for attr, value in labels.items():
+							result = results[attr].get("value")
+							values = values + ";" + str(result)
+							objects_found = objects_found + result
+						line = line + ";" + str(objects_found) + values
+						output.write(line)
+					
+					target_path = done_folder
+					if objects_found > 0:
+						target_path = target_path + "/positive/"
+					else:
+						target_path = target_path + "/negative/"
+					if not os.path.exists(target_path):
+						os.mkdir(target_path)
+					shutil.move(input_folder + "/" + input_filename, target_path + input_filename)
+					print ("Moved file " + input_filename + " to " + target_path)
+					
+
+					elapsed_time = time.time() - start_time
+					print('Object detection done! Elapsed time: ' + str(elapsed_time) + 's, number of frames: ' + str(frame_count) + ', fps: ' + str(frame_count / elapsed_time))
+			except Exception as e:
+				print("There was an error while analyzing file " + input_filename)
+				logging.error(traceback.format_exc())
+				shutil.move(input_folder + "/" + input_filename, error_folder + "/" + input_filename)
+				print ("Moved file " + input_filename + " to " + error_folder + "/")
 		time.sleep(1)
 
 if __name__ == '__main__':

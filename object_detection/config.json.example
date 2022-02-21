@@ -8,5 +8,6 @@
 	"input_folder": "/app/input",
 	"done_folder": "/app/done",
 	"output_folder": "/app/output",
+	"error_folder": "/app/error",
 	"model_dir": "/app/models"
 }
