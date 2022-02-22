@@ -87,6 +87,9 @@ def make_interpreter(model_dir, num_threads):
 		model_path=model_file,
 		num_threads=num_threads
 	)
+	
+def change_file_permission(file_path):
+	os.system('chmod -R 777 "' + file_path + '"')
 
 
 def main():
@@ -231,7 +234,10 @@ def main():
 										frame_filename = movie + "__" + frame_filename
 									if not os.path.exists(frame_path):
 										os.makedirs(frame_path)
-									cv2.imwrite(os.path.join(frame_path, frame_filename + ".jpg"), image)
+										change_file_permission(frame_path)
+									frame_path = os.path.join(frame_path, frame_filename + ".jpg")
+									cv2.imwrite(frame_path, image)
+									change_file_permission(frame_path)
 									print ("Frame saved to ", frame_path)
 					
 						# add frame results to global results
@@ -255,6 +261,7 @@ def main():
 							for attr, value in labels.items():
 								line = line + ";" + str(results[attr].get("name"))
 							output.write(line)
+						change_file_permission(output_file)
 					
 					objects_found = 0
 
@@ -275,7 +282,9 @@ def main():
 						target_path = target_path + "/negative/"
 					if not os.path.exists(target_path):
 						os.mkdir(target_path)
+						change_file_permission(target_path)
 					shutil.move(input_folder + "/" + input_filename, target_path + input_filename)
+					change_file_permission(target_path + input_filename)
 					print ("Moved file " + input_filename + " to " + target_path)
 					
 
@@ -285,6 +294,7 @@ def main():
 				print("There was an error while analyzing file " + input_filename)
 				logging.error(traceback.format_exc())
 				shutil.move(input_folder + "/" + input_filename, error_folder + "/" + input_filename)
+				change_file_permission(error_folder + "/" + input_filename)
 				print ("Moved file " + input_filename + " to " + error_folder + "/")
 		time.sleep(1)
 
