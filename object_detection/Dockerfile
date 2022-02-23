@@ -1,4 +1,5 @@
 FROM ubuntu:20.04
+LABEL version=1.0
 
 #RUN pip3 install pycoral
 #RUN pip3 install --index-url https://google-coral.github.io/py-repo/ tflite_runtime

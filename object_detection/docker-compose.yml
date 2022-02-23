@@ -1,18 +1,18 @@
 version: "3.7"
 services:
     analyzer:
-        container_name: analyzer 
+        container_name: analyzer
         build:
             context: .
             dockerfile: Dockerfile
         network_mode: host
         restart: "no"
         volumes:
-            - ./input:/app/input
-            - ./done:/app/done
-            - ./output:/app/output
+            - ./../../input:/app/input
+            - ./../../done:/app/done
+            - ./../../output:/app/output
             - ./models:/app/models
-            - ./error:/app/error
+            - ./../../error:/app/error
             - ./config.json:/app/config.json
         environment:
             - OBJECT_DETECTION_THREADS=${OBJECT_DETECTION_THREADS}
