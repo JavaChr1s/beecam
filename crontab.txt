@@ -1,0 +1,2 @@
+0 7 * * * pi cd /home/pi/repo/motioneye && docker-compose start
+31 18 * * * pi cd /home/pi/repo/motioneye && docker-compose stop	
