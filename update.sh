@@ -1,5 +1,5 @@
 #!/bin/bash
-COMPOSE_FILE_NAME="docker-compose.yml"
+COMPOSE_FILE_NAME="docker-compose_raspi.yml"
 
 function updateAndStart() {
 	local container_name=$1
