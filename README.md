@@ -11,6 +11,11 @@
   * raw
 * Rename `object_detection/.env.example` to `object_detection/.env` and configure it to your needs
 * Add your public-key to git, otherwise the auto-update won't work
+* Add those two lines to `/etc/crontab` and `/etc/fstab`:
+```
+#BEECAM-START
+#BEECAM-END
+```
 * Reboot. The reboot will install your `/etc/crontab` and `/etc/fstab` (mount usbstick) automatically
 
 # Update
