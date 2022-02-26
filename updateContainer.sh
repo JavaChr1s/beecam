@@ -41,8 +41,6 @@ function startService() {
 }
 
 function startServer() {
-	git fetch
-	git reset --hard origin/master
 	updateAndStart "object_detection_analyzer" "object_detection"
 	startService "motioneye"
 }
