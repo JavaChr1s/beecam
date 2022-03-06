@@ -1,7 +1,15 @@
 # Install
 
 * Install `docker` and `docker-compose`
-* Add the `update.sh` to init.d to run on every boot. There is a `beecam.sh.example-init.d` example file. Adjust it to your needs and move it to `/etc/init.d/`: `mv ~/repo/beecam.sh.example-init.d /etc/init.d/beecam.sh`
+* Enable the auto-update by typing:
+```
+sudo systemctl --force --full edit beecam-update.service
+```
+Paste the content of `beecam-update.service.example` into the opened editor.
+Type the following to enable it:
+```
+sudo systemctl enable beecam-update.service
+```
 * Adjust the `crontab.txt` to your needs, f.e. if you want to capture movies only between 7am and 6pm
 * Copy `object_detection/config.json.example` to your usbstick, rename it to `config.json` and configure it to your needs
 * If you are using the default-configuration from `config.json.example` create the following folders on your usbstick:
