@@ -1,0 +1,38 @@
+[  
+  {
+    "id": "status",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "git status && git log -1 && docker ps"
+      }
+    ]
+  },
+  {
+    "id": "save-config",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "git add . && git commit -m \"Save config\" && git pull --rebase && git push"
+      }
+    ]
+  },
+  {
+    "id": "update",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "echo raspberry | sudo -S ./update.sh"
+      }
+    ]
+  }
+]

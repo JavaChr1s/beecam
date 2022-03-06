@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+    webhook:
+        container_name: webhook 
+        build:
+            context: .
+            dockerfile: Dockerfile_raspi
+        restart: always
+        command: ["-verbose", "-hooks=/etc/webhook/hooks.json"]
+        ports:
+            - 9000:9000
+        volumes:
+            - ./hooks:/etc/webhook
+        privileged: true
