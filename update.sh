@@ -7,4 +7,5 @@ function update() {
 	./updateCrontab.sh
 }
 
+cd "$(dirname "$0")"
 update > /media/usbstick/update.log
