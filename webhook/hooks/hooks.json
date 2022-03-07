@@ -34,5 +34,53 @@
         "name": "echo raspberry | sudo -S ./update.sh"
       }
     ]
+  },
+  {
+    "id": "logs-analyzer",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "docker logs analzyer"
+      }
+    ]
+  },
+  {
+    "id": "logs-motioneye",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "docker logs motioneye"
+      }
+    ]
+  },
+  {
+    "id": "logs-webhook",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "docker logs webhook"
+      }
+    ]
+  },
+  {
+    "id": "logs-update",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "cat /media/usbstick/update.log"
+      }
+    ]
   }
 ]
