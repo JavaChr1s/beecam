@@ -43,7 +43,7 @@
     [
       {
         "source": "string",
-        "name": "docker logs analzyer"
+        "name": "docker logs analyzer"
       }
     ]
   },
@@ -80,6 +80,30 @@
       {
         "source": "string",
         "name": "cat /media/usbstick/update.log"
+      }
+    ]
+  },
+  {
+    "id": "restart-motioneye",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "docker restart motioneye"
+      }
+    ]
+  },
+  {
+    "id": "reboot",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "echo raspberry | sudo -S reboot"
       }
     ]
   }
