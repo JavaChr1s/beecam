@@ -1,2 +1,2 @@
 0 7 * * * pi cd /home/pi/repo/motioneye && docker-compose -f docker-compose_raspi.yml start
-30 8 * * * pi cd /home/pi/repo/motioneye && docker-compose -f docker-compose_raspi.yml stop	
+0 17 * * * pi cd /home/pi/repo/motioneye && docker-compose -f docker-compose_raspi.yml stop	
