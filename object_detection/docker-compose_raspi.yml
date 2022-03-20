@@ -12,6 +12,6 @@ services:
             - /media/usbstick/analyzed:/app/done
             - /media/usbstick/data:/app/output
             - /media/usbstick/error:/app/error
-            - /media/usbstick/config.json:/app/config.json
+            - ./config_raspi.json:/app/config.json
             - ./models:/app/models
         privileged: true

@@ -1,0 +1,15 @@
+{
+	"general_frames_folder": true,
+	"draw_box": false,
+
+	"threshold": 0.4,
+	"debug_threshold": 0.3,
+	
+	"threads": 4,
+
+	"input_folder": "/app/input",
+	"done_folder": "/app/done",
+	"error_folder": "/app/error",
+	"output_folder": "/app/output",
+	"model_dir": "/app/models"
+}
