@@ -8,4 +8,4 @@ function update() {
 }
 
 cd "$(dirname "$0")"
-update > /media/usbstick/update.log
+update | tee ./update.log /media/usbstick/update.log
