@@ -3,7 +3,7 @@ function update() {
 	echo `date`
 	waitForConnection
 	sudo -u pi ./updateGit.sh
-	./updateFstab.sh
+	./installUsbmount.sh
 	sudo -u pi ./updateContainer.sh
 	./updateCrontab.sh
 	ifconfig -a
