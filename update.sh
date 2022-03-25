@@ -28,4 +28,4 @@ function waitForConnection() {
 }
 
 cd "$(dirname "$0")"
-update > ../update.log
+update >> ../update.log
