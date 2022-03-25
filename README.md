@@ -19,19 +19,19 @@ sudo systemctl enable beecam-update.service
   * raw
 * Rename `object_detection/.env.example` to `object_detection/.env` and configure it to your needs
 * Add your public-key to git, otherwise the auto-update won't work
-* Add those two lines to `/etc/crontab` and `/etc/fstab`:
+* Add those two lines to `/etc/crontab`:
 ```
 #BEECAM-START
 #BEECAM-END
 ```
-* Reboot. The reboot will install your `/etc/crontab` and `/etc/fstab` (mount usbstick) automatically
+* Reboot. The reboot will install your `/etc/crontab` automatically
 
 # Update
 Just push some changes to your git-fork. If you have configured the `update.sh` to run on boot as described in the `Install`-section everything is updated automatically on reboot (while you are connected to the internet).
 
 If you want to update manually, you can do that using `sudo ./update.sh`. It's important to always call it as root!
 
-The update-logs are saved on your usbstick `/media/usbstick/update.log`, so you can easily check if the update-went well.
+The update-logs are saved outside you cloned git repo `../update.log`, so you can easily check if the update-went well.
 
 # Create a new model
 Your training- and test-data should be labeled using the PASCAL-VOC XML format. We expect one XML-file per image.
