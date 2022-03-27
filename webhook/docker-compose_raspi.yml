@@ -6,9 +6,9 @@ services:
             context: .
             dockerfile: Dockerfile_raspi
         restart: always
-        command: ["-verbose", "-hooks=/etc/webhook/hooks.json"]
+        command: ["-verbose", "-hooks=/etc/webhook/hooks.json", "-urlprefix="]
         ports:
-            - 9000:9000
+            - 80:9000
         volumes:
             - ./hooks:/etc/webhook
         privileged: true

@@ -43,7 +43,7 @@ function startService() {
 function startServer() {
 	updateAndStart "object_detection_analyzer" "object_detection"
 	startService "motioneye"
-	startService "webhook"
+	updateAndStart "webhook_webhook" "webhook"
 	docker restart "webhook"
 }
 
