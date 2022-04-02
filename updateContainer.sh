@@ -2,18 +2,18 @@
 COMPOSE_FILE_NAME="docker-compose_raspi.yml"
 
 function updateAndStart() {
-	local container_name=$1
+	local image=$1
 	local folder=$2
-	local needUpdate=`checkForUpdate $container_name $folder` # grab the stdout from checkForUpdate
+	local needUpdate=`checkForUpdate $image $folder` # grab the stdout from checkForUpdate
 	echo "needUpdate=$needUpdate"
 	if [ $needUpdate == "true" ]; then rebuildImage "$folder"; fi
 	startService $folder
 }
 
 function checkForUpdate() {
-	local container_name=$1
+	local image=$1
 	local folder=$2
-	local usedVersion=`docker inspect --format '{{ index .Config.Labels "version"}}' $container_name`
+	local usedVersion=`docker inspect --format '{{ index .Config.Labels "version"}}' $image`
 	local currentVersion=`grep "LABEL version" "$folder/Dockerfile_raspi" | awk -F= '{print $2}'`
 	if [ "$currentVersion" != "$usedVersion" ]; then
 		echo "true"
@@ -44,7 +44,6 @@ function startServer() {
 	updateAndStart "object_detection_analyzer" "object_detection"
 	startService "motioneye"
 	updateAndStart "webhook_webhook" "webhook"
-	docker restart "webhook"
 }
 
 startServer

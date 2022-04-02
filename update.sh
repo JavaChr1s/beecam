@@ -1,12 +1,31 @@
 #!/bin/bash
 function update() {
+	echo "INIT BEECAM"
 	echo `date`
+	echo "Stopping all containers:"
+	sudo -u pi docker stop $(docker ps -a -q)
+	echo "Remove all containers:"
+	sudo -u pi docker rm $(docker ps -a -q)
+	sudo -u pi ./initUsbstick.sh
+	createService "webhook"
+	createService "motioneye"
+	createService "object_detection"
+	curl http://localhost/beecam # initialize webinterface
+
+	echo "UPDATE BEECAM"
 	waitForConnection
 	sudo -u pi ./updateGit.sh
-	sudo -u pi ./initUsbstick.sh
 	sudo -u pi ./updateContainer.sh
 	./updateCrontab.sh
 	ifconfig -a
+}
+
+function createService() {
+	local folder=$1
+	echo "Going to create container within $folder"
+	cd $folder
+	sudo -u pi docker-compose -f docker-compose_raspi.yml up -d
+	cd ..
 }
 
 function waitForConnection() {
