@@ -84,7 +84,7 @@
     [
       {
         "source": "string",
-        "name": "cat /media/usbstick/update.log"
+        "name": "cat /home/pi/update.log"
       }
     ]
   },
