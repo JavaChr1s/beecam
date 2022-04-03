@@ -6,8 +6,8 @@ function update() {
 	sudo -u pi docker stop $(docker ps -a -q)
 	echo "Remove all containers:"
 	sudo -u pi docker rm $(docker ps -a -q)
-	sudo -u pi ./initUsbstick.sh
 	createService "webhook"
+	sudo -u pi ./initUsbstick.sh
 	createService "motioneye"
 	createService "object_detection"
 	curl http://localhost/beecam # initialize webinterface
