@@ -19,6 +19,12 @@ sudo systemctl enable beecam-update.service
   * raw
 * Rename `object_detection/.env.example` to `object_detection/.env` and configure it to your needs
 * Add your public-key to git, otherwise the auto-update won't work
+* Change settings in your rpi-eeprom-config using `sudo -E rpi-eeprom-config --edit` and change the following values:
+```
+BOOT_UART=0
+WAKE_ON_GPIO=0
+POWER_OFF_ON_HALT=1
+```
 * Add those two lines to `/etc/crontab`:
 ```
 #BEECAM-START
