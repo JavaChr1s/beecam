@@ -1,2 +1,3 @@
 0 7 * * * pi cd /home/pi/repo/motioneye && docker-compose -f docker-compose_raspi.yml start
-0 17 * * * pi cd /home/pi/repo/motioneye && docker-compose -f docker-compose_raspi.yml stop	
+0 19 * * * pi cd /home/pi/repo/motioneye && docker-compose -f docker-compose_raspi.yml stop
+*/5 * * * * root /bin/ping -q -c10 192.168.0.1 > /dev/null 2>&1 || (ip link set dev wlan0 down ;ip link set dev wlan0 up ;/usr/bin/logger wifi on wlan0 restarted via crontab)
