@@ -32,7 +32,7 @@ function waitForConnection() {
 	# ip server
 	serverAdr="github.com"
 	count=0
-	count_max=600
+	count_max=60
 
 	ping -c 1 $serverAdr > /dev/null 2>&1
 	while [ $? -ne 0 ]; do
