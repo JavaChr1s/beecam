@@ -101,6 +101,18 @@
     ]
   },
   {
+    "id": "start-motioneye",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "docker start motioneye"
+      }
+    ]
+  },
+  {
     "id": "restart-motioneye",
     "execute-command": "/etc/webhook/ssh.sh",
     "include-command-output-in-response": true,

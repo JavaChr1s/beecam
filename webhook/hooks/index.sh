@@ -47,6 +47,7 @@ cat << EOF
         <ul>
             <li><a href="#motioneye" onClick="window.location = new window.URL(window.location.href).origin + ':8765'">MotionEye</a></li>
             <li><a href="/list-data">Print USB-Data</a></li>
+            <li><a href="/start-motioneye">Start motioneye</a></li>
             <li><a href="/reboot" onclick="if(confirm('Are you sure you want to reboot the beecam?')) callAsync('/reboot'); return false;">Reboot</a></li>
             <li><a href="/shutdown" onclick="if(confirm('Are you sure you want to shutdown the beecam?')) callAsync('/shutdown'); return false;">Shutdown</a></li>
             <li><a href="/save-config">Save MotionEye configurations (available only if online)</a></li>
