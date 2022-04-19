@@ -89,6 +89,18 @@
     ]
   },
   {
+    "id": "power-monitoring",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "cat /chris/usbstick/monitoring.txt"
+      }
+    ]
+  },
+  {
     "id": "list-data",
     "execute-command": "/etc/webhook/ssh.sh",
     "include-command-output-in-response": true,

@@ -55,6 +55,7 @@ cat << EOF
         <h2>Technical Links</h2>
         <ul>
             <li><a href="/status">Status</a></li>
+            <li><a href="/power-monitoring">Power-Monitoring</a></li>
             <li><a href="/update" onclick="if(confirm('Are you sure you want to update the beecam?')) callAsync('/update'); return false;">Update</a></li>
             <li><a href="/logs-analyzer">Logs: Analyzer</a></li>
             <li><a href="/logs-motioneye">Logs: MotionEye</a></li>
