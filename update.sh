@@ -17,6 +17,7 @@ function update() {
 	sudo -u pi ./updateGit.sh
 	sudo -u pi ./updateContainer.sh
 	./updateCrontab.sh
+	./additionalUpdates.sh
 	ifconfig -a
 }
 
@@ -48,3 +49,5 @@ function waitForConnection() {
 
 cd "$(dirname "$0")"
 update >> ../update.log
+
+sudo -u pi ./pistatus.sh
