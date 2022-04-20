@@ -84,7 +84,7 @@
     [
       {
         "source": "string",
-        "name": "cat /home/pi/update.log"
+        "name": "cat /home/pi/repo/update.log"
       }
     ]
   },
@@ -96,7 +96,7 @@
     [
       {
         "source": "string",
-        "name": "cat /chris/usbstick/monitoring.txt"
+        "name": "cat /media/usbstick/monitoring.txt"
       }
     ]
   },
