@@ -18,6 +18,7 @@ function update() {
 
 	echo "UPDATE BEECAM"
 	waitForConnection
+	sudo systemctl restart systemd-timesyncd.service
 	sudo mount -o remount,rw /home/pi/repo
 	sudo -u pi ./updateGit.sh
 	sudo mount -o remount,ro /home/pi/repo
