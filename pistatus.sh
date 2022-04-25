@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# disabled because of bad performance
+exit 0
+
 # Before running this script, make sure you have sysbench installed:
 #           sudo apt-get install sysbench
 #
@@ -64,5 +67,5 @@ while true; do
   voltage=$(vcgencmd measure_volts | cut -f2 -d= | sed 's/000//')
   throttled_text=$(throttledToText $(vcgencmd get_throttled | cut -f2 -d=))
   [[ "$throttled_text" != "" ]] && { echo "$(date) -- $temp $sys_clock_speed / $real_clock_speed MHz $voltage - $throttled_text" >> /media/usbstick/monitoring.txt; };
-  sleep 5
+  sleep 60
 done
