@@ -20,7 +20,10 @@ function update() {
 
 	echo "UPDATE BEECAM"
 	waitForConnection
-	sudo systemctl restart systemd-timesyncd.service
+	# update date and time
+	systemctl stop ntp
+	ntpd -q -g
+	systemctl start ntp
 	sudo mount -o remount,rw /home/pi/repo
 	sudo -u pi ./updateGit.sh
 	sudo -u pi ./updateContainer.sh
