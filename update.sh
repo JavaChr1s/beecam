@@ -12,9 +12,15 @@ function update() {
 	createService "object_detection"
 	curl http://localhost/beecam # initialize webinterface
 
+	 # update with version on disk to write to overlayfs
+	./updateCrontab.sh
+	./additionalUpdates.sh
+
 	echo "UPDATE BEECAM"
 	waitForConnection
+	sudo mount -o remount,rw /home/pi/repo
 	sudo -u pi ./updateGit.sh
+	sudo mount -o remount,ro /home/pi/repo
 	sudo -u pi ./updateContainer.sh
 	./updateCrontab.sh
 	./additionalUpdates.sh
