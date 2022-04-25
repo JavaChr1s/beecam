@@ -10,9 +10,10 @@ services:
         volumes:
             - ./../../input:/app/input
             - ./../../done:/app/done
+            - ./../../error:/app/error
             - ./../../output:/app/output
             - ./models:/app/models
-            - ./../../error:/app/error
+            - ./python:/app/python 
             - ./config.json:/app/config.json
         environment:
             - OBJECT_DETECTION_THREADS=${OBJECT_DETECTION_THREADS}

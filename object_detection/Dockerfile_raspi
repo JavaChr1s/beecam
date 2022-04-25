@@ -1,5 +1,5 @@
 FROM armindocachada/tensorflow2-opencv4-raspberrypi4:2.2_4.5.0
-LABEL version=1.0
+LABEL version=1.1
 
 RUN apt-get --allow-releaseinfo-change update
 RUN apt-get -y install curl
@@ -14,8 +14,6 @@ RUN pip3 install imutils
 RUN apt-get install -y ffmpeg
 
 RUN mkdir /app/python -p
-
-COPY python /app/python
 
 WORKDIR /app/python
 
