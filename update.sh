@@ -2,6 +2,8 @@
 function update() {
 	echo "INIT BEECAM"
 	echo `date`
+	mv /var/lib/docker/runtimes /var/lib/docker/runtimes-old
+	systemctl restart docker
 	echo "Stopping all containers:"
 	sudo -u pi docker stop $(docker ps -a -q)
 	echo "Remove all containers:"
@@ -21,7 +23,6 @@ function update() {
 	sudo systemctl restart systemd-timesyncd.service
 	sudo mount -o remount,rw /home/pi/repo
 	sudo -u pi ./updateGit.sh
-	sudo mount -o remount,ro /home/pi/repo
 	sudo -u pi ./updateContainer.sh
 	./updateCrontab.sh
 	./additionalUpdates.sh
@@ -55,6 +56,9 @@ function waitForConnection() {
 }
 
 cd "$(dirname "$0")"
-update >> update.log
+update >> ../update.log
 
-sudo -u pi ./pistatus.sh
+rm update.log -f
+cp ../update.log update.log
+cd /
+sudo mount -o remount,ro /home/pi/repo
