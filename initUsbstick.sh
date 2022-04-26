@@ -8,6 +8,7 @@ function initUsbstick() {
 	createFolderIfNotExists "/media/usbstick/data"
 	createFolderIfNotExists "/media/usbstick/error"
 	createFolderIfNotExists "/media/usbstick/raw"
+	initMotionEye
 	echo "Init usbstick done"
 }
 
@@ -61,6 +62,17 @@ function createFolderIfNotExists() {
 		rm -f $folder
 		mkdir -p $folder
 	fi
+}
+
+function initMotionEye() {
+	createFolderIfNotExists "/media/usbstick/motioneye"
+	# override configs if exists
+	cp /home/pi/repo/motioneye/motioneye/camera-1.conf /media/usbstick/motioneye/ -fv
+	cp /home/pi/repo/motioneye/motioneye/motion.conf /media/usbstick/motioneye/ -fv
+	cp /home/pi/repo/motioneye/motioneye/motioneye.conf /media/usbstick/motioneye/ -fv
+	cp /home/pi/repo/motioneye/motioneye/tasks.pickle /media/usbstick/motioneye/ -fv
+	# don't override mask if exists
+	cp /home/pi/repo/motioneye/motioneye/mask_1.pgm /media/usbstick/motioneye/ -nv
 }
 
 initUsbstick

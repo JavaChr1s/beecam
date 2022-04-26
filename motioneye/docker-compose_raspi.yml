@@ -9,7 +9,7 @@ services:
             - 8081:8081
         volumes:
             - /etc/localtime:/etc/localtime:ro
-            - ./motioneye:/etc/motioneye
+            - /media/usbstick/motioneye:/etc/motioneye
             - /media/usbstick:/var/lib/motioneye
         privileged: true
         environment:
