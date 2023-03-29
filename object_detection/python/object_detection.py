@@ -160,6 +160,12 @@ def main():
 				if os.path.isfile(input_file) and input_file.endswith(".mp4"):
 
 					movie = input_filename.split(".")[0]
+
+					movie_date = None
+					movie_time = None
+					if "__" in movie:
+						movie_date = movie.split("__")[0]
+						movie_time = movie.split("__")[1]
 			
 					results = {}
 					for attr, value in labels.items():
@@ -266,6 +272,7 @@ def main():
 					cap.release()
 					cv2.destroyAllWindows()
 
+					# flatten results
 					flattened_result = None
 					if not multiple_results_on_one_frame:
 						max_result = { 'frames': 0 }
@@ -277,9 +284,10 @@ def main():
 						print ("flatten results " + str(results) + " since there was only one result per frame: " + str(flattened_result.get("name")))
 
 					
+					# write csv header
 					if not os.path.isfile(output_file):
 						with open(output_file, "x") as output:
-							line = "file;sum"
+							line = "file;date;time;sum"
 							for attr, value in labels.items():
 								line = line + ";" + str(results[attr].get("name"))
 							output.write(line)
@@ -287,8 +295,9 @@ def main():
 					
 					objects_found = 0
 
+					# write csv values
 					with open(output_file, "a") as output:
-						line = "\n" + input_filename
+						line = "\n" + input_filename + ";" + movie_date + ";" + movie_time
 						values = ""
 						for attr, value in labels.items():
 							result = 0
@@ -301,6 +310,21 @@ def main():
 						line = line + ";" + str(objects_found) + values
 						output.write(line)
 					
+					# Move output frames into classified folders
+					classification = "unspecific"
+					if flattened_result is not None:
+						classification = flattened_result.get("name")
+					classified_frame_path = output_folder + "/frames/"
+					if movie_date is not None:
+						classified_frame_path = classified_frame_path + movie_date + "/"
+					classified_frame_path = classified_frame_path + classification
+					if not os.path.exists(classified_frame_path):
+						os.makedirs(classified_frame_path)
+						change_file_permission(classified_frame_path)
+					shutil.move(frame_folder, classified_frame_path + "/" + movie)
+					change_file_permission(classified_frame_path + "/" + movie)
+					
+					# Move movie into positive/negative folders
 					target_path = done_folder
 					if objects_found > 0:
 						target_path = target_path + "/positive/"
@@ -312,15 +336,8 @@ def main():
 					shutil.move(input_folder + "/" + input_filename, target_path + input_filename)
 					change_file_permission(target_path + input_filename)
 					print ("Moved file " + input_filename + " to " + target_path)
-					
-					if flattened_result is not None:
-						classified_frame_path = output_folder + "/frames/" + flattened_result.get("name")
-						if not os.path.exists(classified_frame_path):
-							os.mkdir(classified_frame_path)
-							change_file_permission(classified_frame_path)
-						shutil.move(frame_folder, classified_frame_path + "/" + movie)
-						change_file_permission(classified_frame_path + "/" + movie)
 
+					# log statistics
 					elapsed_time = time.time() - start_time
 					print('Object detection done! Elapsed time: ' + str(elapsed_time) + 's, number of frames: ' + str(frame_count) + ', fps: ' + str(frame_count / elapsed_time))
 			except Exception as e:
