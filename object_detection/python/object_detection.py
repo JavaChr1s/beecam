@@ -161,6 +161,8 @@ def main():
 
 					movie = input_filename.split(".")[0]
 
+					frame_folder = None
+
 					movie_date = None
 					movie_time = None
 					if "__" in movie:
@@ -281,7 +283,7 @@ def main():
 								max_result = results[attr]
 						if max_result.get("frames") > 0:
 							flattened_result = max_result
-						print ("flatten results " + str(results) + " since there was only one result per frame: " + str(flattened_result.get("name")))
+							print ("flatten results " + str(results) + " since there was only one result per frame: " + str(flattened_result.get("name")))
 
 					
 					# write csv header
@@ -311,18 +313,19 @@ def main():
 						output.write(line)
 					
 					# Move output frames into classified folders
-					classification = "unspecific"
-					if flattened_result is not None:
-						classification = flattened_result.get("name")
-					classified_frame_path = output_folder + "/frames/"
-					if movie_date is not None:
-						classified_frame_path = classified_frame_path + movie_date + "/"
-					classified_frame_path = classified_frame_path + classification
-					if not os.path.exists(classified_frame_path):
-						os.makedirs(classified_frame_path)
-						change_file_permission(classified_frame_path)
-					shutil.move(frame_folder, classified_frame_path + "/" + movie)
-					change_file_permission(classified_frame_path + "/" + movie)
+					if frame_folder is not None:
+						classification = "unspecific"
+						if flattened_result is not None:
+							classification = flattened_result.get("name")
+						classified_frame_path = output_folder + "/frames/"
+						if movie_date is not None:
+							classified_frame_path = classified_frame_path + movie_date + "/"
+						classified_frame_path = classified_frame_path + classification
+						if not os.path.exists(classified_frame_path):
+							os.makedirs(classified_frame_path)
+							change_file_permission(classified_frame_path)
+						shutil.move(frame_folder, classified_frame_path + "/" + movie)
+						change_file_permission(classified_frame_path + "/" + movie)
 					
 					# Move movie into positive/negative folders
 					target_path = done_folder
