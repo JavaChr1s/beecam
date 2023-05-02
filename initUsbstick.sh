@@ -67,12 +67,13 @@ function createFolderIfNotExists() {
 function initMotionEye() {
 	createFolderIfNotExists "/media/usbstick/motioneye"
 	# override configs if exists
-	cp /home/pi/repo/motioneye/motioneye/camera-1.conf /media/usbstick/motioneye/ -fv
 	cp /home/pi/repo/motioneye/motioneye/motion.conf /media/usbstick/motioneye/ -fv
 	cp /home/pi/repo/motioneye/motioneye/motioneye.conf /media/usbstick/motioneye/ -fv
 	cp /home/pi/repo/motioneye/motioneye/tasks.pickle /media/usbstick/motioneye/ -fv
 	# don't override mask if exists
 	cp /home/pi/repo/motioneye/motioneye/mask_1.pgm /media/usbstick/motioneye/ -nv
+	# don't override camera-config if exists
+	cp /home/pi/repo/motioneye/motioneye/camera-1.conf /media/usbstick/motioneye/ -nv
 
 	createFolderIfNotExists "/media/usbstick/config"
 }

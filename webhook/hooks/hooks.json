@@ -187,5 +187,17 @@
         "name": "date"
       }
     ]
+  },
+  {
+    "id": "reset-camera-config",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "docker stop motioneye && cp /home/pi/repo/motioneye/motioneye/camera-1.conf /media/usbstick/motioneye/ -fv && docker start motioneye"
+      }
+    ]
   }
 ]

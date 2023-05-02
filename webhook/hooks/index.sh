@@ -62,6 +62,7 @@ cat << EOF
             <li><a href="/list-data">Print USB-Data</a></li>
             <li><a href="/start-motioneye">Start motioneye</a></li>
             <li><a href="/stop-motioneye">Stop motioneye</a></li>
+            <li><a href="/reset-camera-config" onclick="if(confirm('Are you sure you want to reset the camera-config to default?')) callAsync('/reset-camera-config'); return false;">Reset motioneye config</a></li>
             <li><a href="/reboot" onclick="if(confirm('Are you sure you want to reboot the beecam?')) callAsync('/reboot'); return false;">Reboot</a></li>
             <li><a href="/shutdown" onclick="if(confirm('Are you sure you want to shutdown the beecam?')) callAsync('/shutdown'); return false;">Shutdown</a></li>
             <li><a href="/save-config">Save MotionEye configurations (available only if online)</a></li>
