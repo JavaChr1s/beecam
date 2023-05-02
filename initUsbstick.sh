@@ -73,6 +73,8 @@ function initMotionEye() {
 	cp /home/pi/repo/motioneye/motioneye/tasks.pickle /media/usbstick/motioneye/ -fv
 	# don't override mask if exists
 	cp /home/pi/repo/motioneye/motioneye/mask_1.pgm /media/usbstick/motioneye/ -nv
+
+	createFolderIfNotExists "/media/usbstick/config"
 }
 
 initUsbstick
