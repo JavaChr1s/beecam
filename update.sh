@@ -60,9 +60,9 @@ function waitForConnection() {
 }
 
 cd "$(dirname "$0")"
-update >> ../update.log
-
+update > ../update.log
 rm update.log -f
 cp ../update.log update.log
+
 cd /
 sudo mount -o remount,ro /home/pi/repo
