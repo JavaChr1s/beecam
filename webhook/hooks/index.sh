@@ -2,6 +2,14 @@
 HOSTNAME=`/etc/webhook/ssh.sh hostname | tail -n +2`
 DATE=`/etc/webhook/ssh.sh date | tail -n +2`
 
+if /etc/webhook/ssh.sh 'cat /boot/cmdline.txt' | tail -n +2 | grep -q "maxcpus=4 "
+then
+    MODE="Performance-Mode"
+    BGCOLOR="#007700"
+else
+    MODE="PowerSafe-Mode"
+    BGCOLOR="#FF8800"
+fi
 cat << EOF
 <html>
 	<head>
@@ -11,7 +19,7 @@ cat << EOF
                 font-size: 16pt;
             }
             body {
-                background-color: #007700;
+                background-color: $BGCOLOR;
                 color: #FFFFFF !important;
             }
             h1 {
@@ -55,6 +63,10 @@ cat << EOF
                 <th>date</th>
                 <td>$DATE <a href="#" onclick="refreshDate()">Refresh Date</a></td>
             </tr>
+            <tr>
+                <th>mode</th>
+                <td>$MODE</td>
+            </tr>
         </table>
         <h2>Menu</h2>
         <ul>
@@ -62,6 +74,8 @@ cat << EOF
             <li><a href="/list-data">Print USB-Data</a></li>
             <li><a href="/start-motioneye">Start motioneye</a></li>
             <li><a href="/stop-motioneye">Stop motioneye</a></li>
+            <li><a href="/mode-performance" onclick="if(confirm('Are you sure you want to enable the Performance-Mode?')) callAsync('/mode-performance'); return false;">Enable Performance-Mode</a></li>
+            <li><a href="/mode-powersafe" onclick="if(confirm('Are you sure you want to enable the PowerSafe-Mode?')) callAsync('/mode-powersafe'); return false;">Enable PowerSafe-Mode</a></li>
             <li><a href="/reset-camera-config" onclick="if(confirm('Are you sure you want to reset the camera-config to default?')) callAsync('/reset-camera-config'); return false;">Reset motioneye config</a></li>
             <li><a href="/reboot" onclick="if(confirm('Are you sure you want to reboot the beecam?')) callAsync('/reboot'); return false;">Reboot</a></li>
             <li><a href="/shutdown" onclick="if(confirm('Are you sure you want to shutdown the beecam?')) callAsync('/shutdown'); return false;">Shutdown</a></li>

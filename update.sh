@@ -28,6 +28,11 @@ function update() {
 	sudo -u pi ./updateGit.sh
 	sudo -u pi ./initUsbstick.sh
 	sudo -u pi ./updateContainer.sh
+	# stop the analyzer if PowerSafe-Mode is active
+	if grep -q "maxcpus=1 " /boot/cmdline.txt
+	then
+		docker stop analyzer
+	fi
 	./updateCrontab.sh
 	./additionalUpdates.sh
 	ifconfig -a

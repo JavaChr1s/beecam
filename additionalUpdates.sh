@@ -2,6 +2,8 @@
 
 # PERFORMANCE
 
+# Disable ethernet
+ifconfig eth0 down 
 
 # THIS DOES ACTUALLY NOT WORK BECAUSE OF OTHER DRIVER
 # disable HDMI output

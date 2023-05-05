@@ -199,5 +199,29 @@
         "name": "docker stop motioneye && cp /home/pi/repo/motioneye/motioneye/camera-1.conf /media/usbstick/motioneye/ -fv && docker start motioneye"
       }
     ]
+  },
+  {
+    "id": "mode-performance",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "echo raspberry | sudo -S /home/pi/repo/enablePerformanceMode.sh"
+      }
+    ]
+  },
+  {
+    "id": "mode-powersafe",
+    "execute-command": "/etc/webhook/ssh.sh",
+    "include-command-output-in-response": true,
+    "pass-arguments-to-command":
+    [
+      {
+        "source": "string",
+        "name": "echo raspberry | sudo -S /home/pi/repo/enablePowerSafeMode.sh"
+      }
+    ]
   }
 ]
