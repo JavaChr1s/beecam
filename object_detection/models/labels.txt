@@ -1,8 +1,15 @@
-bumblebee
-hoverfly
-bug
 fly
 bee
-pollen beetle
-weevil
+hoverfly
+aphid
+Chrysididae
+wasp
+bumblebee
+Bombyliidae
+panorpa
 beetle
+pollen beetle
+bird
+weevil
+other
+butterfly

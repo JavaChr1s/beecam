@@ -202,10 +202,10 @@ def main():
 						interpreter.invoke()
 
 						# Retrieve detection results
-						boxes = interpreter.get_tensor(output_details[0]['index'])[0] # Bounding box coordinates of detected objects
-						classes = interpreter.get_tensor(output_details[1]['index'])[0] # Class index of detected objects
-						scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
-						#num = interpreter.get_tensor(output_details[3]['index'])[0]	# Total number of detected objects (inaccurate and not needed)
+						scores = interpreter.get_tensor(output_details[0]['index'])[0] # Confidence of detected objects
+						boxes = interpreter.get_tensor(output_details[1]['index'])[0] # Bounding box coordinates of detected objects
+						num = interpreter.get_tensor(output_details[2]['index'])[0] # Total number of detected objects (inaccurate and not needed)
+						classes = interpreter.get_tensor(output_details[3]['index'])[0]	# Class index of detected objects
 
 						# initialize frame results
 						frameResults = {}
@@ -299,7 +299,12 @@ def main():
 
 					# write csv values
 					with open(output_file, "a") as output:
-						line = "\n" + input_filename + ";" + movie_date + ";" + movie_time
+						line = "\n" + input_filename + ";"
+						if movie_date is not None:
+							line = line + movie_date
+						line = line + ";"
+						if movie_time is not None:
+							line = line + movie_time
 						values = ""
 						for attr, value in labels.items():
 							result = 0
