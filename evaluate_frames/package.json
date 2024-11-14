@@ -1,0 +1,11 @@
+{
+  "name": "evaluate-dirs",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "evaluate": "node ./evaluate"
+  },
+  "dependencies": {
+    "write-excel-file": "^1.4.29"
+  }
+}
